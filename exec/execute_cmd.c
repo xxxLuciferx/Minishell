@@ -6,7 +6,7 @@
 /*   By: msodor <msodor@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/11 14:30:12 by msodor            #+#    #+#             */
-/*   Updated: 2023/07/07 14:57:28 by msodor           ###   ########.fr       */
+/*   Updated: 2023/07/10 15:09:30 by msodor           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ void	redirect_to_pipe(t_cmd *cmd, t_parser *parser, int (*fd)[2])
 {
 	if (cmd->index == 0)
 	{
+		if (cmd->redir && cmd->redir->old_outfd != -1)
+			return ;
 		if (dup2(fd[cmd->index][1], 1) == -1)
 			perror("dup2 error");
 	}
@@ -36,12 +38,16 @@ void	redirect_to_pipe(t_cmd *cmd, t_parser *parser, int (*fd)[2])
 	{
 		if (cmd->index == parser->cmd_nbr - 1)
 		{
+			if (cmd->redir && cmd->redir->old_infd != -1)
+				return ;
 			dup2(fd[cmd->index - 1][0], 0);
 		}
 		else
 		{
-			dup2(fd[cmd->index - 1][0], 0);
-			dup2(fd[cmd->index][1], 1);
+			if (!cmd->redir || cmd->redir->old_infd == -1)
+				dup2(fd[cmd->index - 1][0], 0);
+			if (!cmd->redir || cmd->redir->old_outfd == -1)
+				dup2(fd[cmd->index][1], 1);
 		}
 	}
 	close_pipes(fd, parser);
@@ -65,11 +71,11 @@ void	builtins(t_cmd *cmd, t_parser *parser, int (*fd)[2])
 			ft_export(cmd, parser);
 		else if (!ft_strcmp(cmd->cmd, "unset"))
 			ft_unset(cmd, parser);
-		else if (!ft_strncmp(cmd->cmd, "exit", ft_strlen("exit")))
-			return;
+		else if (!ft_strcmp(cmd->cmd, "exit"))
+			ft_exit(parser);
 		else
 			exec_cmd(parser, cmd);
 		if (parser->cmd_nbr > 1)
-			exit(0);
+			exit(parser->exit_s);
 	}
 }
