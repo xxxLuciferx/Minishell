@@ -3,14 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: msodor <msodor@student.42.fr>              +#+  +:+       +#+        */
+/*   By: khaimer <khaimer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 21:27:23 by msodor            #+#    #+#             */
-/*   Updated: 2023/07/10 15:06:41 by msodor           ###   ########.fr       */
+/*   Updated: 2023/07/14 14:16:14 by khaimer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/minishell.h"
+
+t_parser	g_parser;
+
+void	signal_handler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		g_parser.exit_s = 1;
+	}
+}
 
 void	prinsipal(t_parser *parser)
 {
@@ -21,7 +35,7 @@ void	prinsipal(t_parser *parser)
 	{
 		command = readline(CYAN"minishell"RESET MAGENTA"[$]~>:"RESET);
 		if (command == NULL)
-			break ;
+			exit(parser->exit_s);
 		if (command[0] == 0)
 		{
 			free(command);
@@ -42,15 +56,13 @@ void	prinsipal(t_parser *parser)
 
 int	main(int ac, char **av, char **env)
 {
-	t_parser	*parser;
-
 	(void)av;
-	parser = malloc(sizeof(t_parser));
 	if (ac != 1 || !env)
 		return (1);
-	parser->env = get_env(env);
-	parser->exit_s = 0;
-	prinsipal(parser);
-	free_env_list(parser->env);
-	free(parser);
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
+	g_parser.env = get_env(env);
+	g_parser.exit_s = 0;
+	prinsipal(&g_parser);
+	free_env_list(g_parser.env);
 }

@@ -6,7 +6,7 @@
 /*   By: msodor <msodor@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 17:53:37 by msodor            #+#    #+#             */
-/*   Updated: 2023/07/10 12:48:03 by msodor           ###   ########.fr       */
+/*   Updated: 2023/07/14 13:25:12 by msodor           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ void	cmd_nbr(t_elems *elems, t_parser *parser)
  */
 void	init_cmds(t_elems *elems, t_parser *parser)
 {
-	int			i;
-	int			argc;
-	t_cmd		**cms;
+	int		i;
+	int		argc;
+	t_cmd	**cms;
 
 	cmd_nbr(elems, parser);
 	i = 0;
@@ -130,10 +130,14 @@ char	**turn_env(char *var, t_env *env)
 	env = env->next;
 	while (env)
 	{
-		if (!ft_strncmp(var, env->key, ft_strlen(var) + 1))
+		if (!ft_strcmp(var, env->key))
 		{
 			if (env->value)
+			{
+				if (env->value[0] == '\0')
+					break ;
 				return (ft_split(env->value, " \t"));
+			}
 			else
 				break ;
 		}

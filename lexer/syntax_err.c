@@ -6,7 +6,7 @@
 /*   By: msodor <msodor@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:26:53 by msodor            #+#    #+#             */
-/*   Updated: 2023/06/25 16:58:55 by msodor           ###   ########.fr       */
+/*   Updated: 2023/07/13 17:44:38 by msodor           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ void	put_syntax_err(char *elem)
  */
 int	is_redir(t_elems *elems)
 {
-	if (elems->type == REDIR_IN || elems->type == REDIR_OUT \
-	|| elems->type == HERE_DOC || elems->type == AREDIR_OUT)
+	if (elems->type == REDIR_IN || elems->type == REDIR_OUT
+		|| elems->type == HERE_DOC || elems->type == AREDIR_OUT)
 		return (1);
 	return (0);
 }
@@ -58,7 +58,7 @@ int	quotes_syntax(t_elems *elems, t_parser *parser)
 	if ((count % 2) != 0 || (dcount % 2) != 0)
 	{
 		write(2, "minishell: ", 11);
-		write(2, "syntax error: unclosed quotes.\n", 31);
+		write(2, "unexpected EOF while looking for matching.\n", 43);
 		return (parser->exit_s = 2, 1);
 	}
 	return (0);
@@ -72,8 +72,8 @@ int	redir_syntax(t_elems *elems, t_parser *parser)
 {
 	while (elems && elems->next)
 	{
-		if (is_redir(elems) && elems->next->type != WORD \
-		&& elems->next->type != VAR)
+		if (is_redir(elems) && elems->next->type != WORD
+			&& elems->next->type != VAR)
 		{
 			put_syntax_err(elems->next->content);
 			return (parser->exit_s = 2, 1);

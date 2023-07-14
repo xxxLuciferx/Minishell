@@ -6,11 +6,12 @@
 /*   By: msodor <msodor@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:56:55 by msodor            #+#    #+#             */
-/*   Updated: 2023/07/07 11:11:26 by msodor           ###   ########.fr       */
+/*   Updated: 2023/07/14 13:14:04 by msodor           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
 /**
  * cmd_new - function that creates a new cmd element
  * @content: a pointer to the content string

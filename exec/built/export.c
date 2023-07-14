@@ -6,7 +6,7 @@
 /*   By: msodor <msodor@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 01:42:00 by msodor            #+#    #+#             */
-/*   Updated: 2023/07/05 12:59:30 by msodor           ###   ########.fr       */
+/*   Updated: 2023/07/14 13:25:57 by msodor           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	is_correct(char *word)
 	i = 0;
 	if (!ft_isalpha(word[i]) && word[i] != '_')
 	{
-		write(2, "export: `", 9);
+		write(2, "minishell: `", 12);
 		write(2, word, ft_strlen(word));
 		write(2, "': not a valid identifier\n", 26);
 		return (0);
@@ -34,7 +34,7 @@ int	is_correct(char *word)
 	{
 		if (!ft_isalnum(word[i]) && word[i] != '_')
 		{
-			write(2, "export: `", 9);
+			write(2, "minishell: `", 12);
 			write(2, word, ft_strlen(word));
 			write(2, "': not a valid identifier\n", 26);
 			return (0);
@@ -44,38 +44,18 @@ int	is_correct(char *word)
 	return (1);
 }
 
-/**
- * set_value - function that sets the value of an environment variable
- * @var: The variable string in the format "key=value"
- * @env: A pointer to the head of the environment variable linked list
- * Return: void
- */
-void	set_value(char *var, t_env *env)
+void	print_value(char *value)
 {
-	t_env	*new_env;
-	t_env	*tmp;
+	int		i;
 
-	new_env = env_new(var);
-	tmp = env;
-	while (tmp && tmp->next && new_env->value)
+	i = 0;
+	while (value[i])
 	{
-		tmp = tmp->next;
-		if (!ft_strncmp(new_env->key, tmp->key, ft_strlen(tmp->key) + 1))
-		{
-			free(tmp->value);
-			tmp->value = new_env->value;
-			return ;
-		}
+		if (value[i] == '\"' || value[i] == '$')
+			write(1, "\\", 1);
+		write(1, &value[i], 1);
+		i++;
 	}
-	tmp = env;
-	while (tmp && tmp->next && !new_env->value)
-	{
-		tmp = tmp->next;
-		if (!ft_strncmp(new_env->key, tmp->key, ft_strlen(tmp->key) + 1))
-			return ;
-	}
-	env_list_add(&tmp, new_env);
-	return ;
 }
 
 /**
@@ -89,9 +69,19 @@ void	print_export(t_env *env)
 	{
 		env = env->next;
 		if (env->value)
-			printf("declare -x %s=\"%s\"\n", env->key, env->value);
+		{
+			write(1, "declare -x ", 11);
+			write(1, env->key, ft_strlen(env->key));
+			write(1, "=\"", 2);
+			print_value(env->value);
+			write(1, "\"\n", 2);
+		}
 		else
-			printf("declare -x %s\n", env->key);
+		{
+			write(1, "declare -x ", 11);
+			write(1, env->key, ft_strlen(env->key));
+			write(1, "\n", 1);
+		}
 	}
 }
 
